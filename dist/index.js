@@ -377,7 +377,7 @@ const token = core.getInput("github-token", { required: true }),
     masterBranch = getBranch("master"),
     label = getInput("label", "자동머지"),
     auto_merge = getInput("auto-merge", "true"),
-    auto_merge_branches = getInput("auto_merge_branches", "release"),
+    auto_merge_branches = getInput("auto-merge-branches", "release"),
     require_merge = getInput("require-merge", "false") == "true",
     context = github.context,
     owner = context.repo.owner,
@@ -417,9 +417,15 @@ async function run() {
         switch (github.context.eventName) {
             case "push": {
                 const branches = auto_merge_branches.split(",").map(e => e.trim());
-                core.info(`auto_merge_branches = ${auto_merge_branches}`)
                 for (const branch of branches) {
                     const base = getBranch(branch);
+                    core.info(`branch = ${branch}`);
+                    const result = client.repos.getBranch({
+                        owner,
+                        repo,
+                        base
+                    });
+                    core.info(JSON.stringify(result));
                     await push(base);
                 }
                 break;
