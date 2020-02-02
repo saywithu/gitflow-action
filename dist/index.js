@@ -372,7 +372,6 @@ const core = __webpack_require__(470),
 
 const token = core.getInput("github-token", { required: true }),
     label = getInput("label", "자동머지"),
-    auto_merge = getInput("auto-merge", "true"),
     auto_merge_branches = getInput("auto-merge-branches", "release"),
     require_merge = getInput("require-merge", "false") == "true",
     context = github.context,
@@ -389,84 +388,31 @@ function getBranch(name) {
     return getInput(name, name);
 }
 
-function isAutoMergeEvent(eventName) {
-    if (auto_merge == "true") {
-        return true;
-    }
-    else {
-        const auto_merge_events = auto_merge.split(",").map(e => e.trim());
-        return auto_merge_events.includes(eventName);
-    }
-}
-
 async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
         if(!auto_merge_branches) return;
         const branchList = await getBranchList();
         core.info(`branchList => ${JSON.stringify(branchList)}`)
-        switch (github.context.eventName) {
-            case "push": {
-                core.info(`auto_merge_branches => ${auto_merge_branches}`)
-                const branches = auto_merge_branches.split(",").map(e => e.trim());
-                for (const branch of branches) {
-                    core.info(`branch = ${branch}`);
-                    if(!branch) break;
-                    const base = getBranch(branch);
-                    core.info(`base branch = ${base}`);
-                    if(branchList.includes(base)){
-                        await push(base);
-                    } else {
-                        core.error(`${base} 브랜치가 존재하지 않습니다.`)
-                    }
+        if(github.context.eventName === "push") {
+            core.info(`auto_merge_branches => ${auto_merge_branches}`)
+            const branches = auto_merge_branches.split(",").map(e => e.trim());
+            for (const branch of branches) {
+                core.info(`branch = ${branch}`);
+                if(!branch) break;
+                const base = getBranch(branch);
+                core.info(`base branch = ${base}`);
+                if(branchList.includes(base)){
+                    await push(base);
+                } else {
+                    core.error(`${base} 브랜치가 존재하지 않습니다.`)
                 }
-                break;
             }
-            case "pull_request_review":
-                if (isAutoMergeEvent("pull_request_review")) {
-                    if (context.payload.pull_request.labels.map(labelMap).includes(label)) {
-                        await merge(context.payload.pull_request.number);
-                    }
-                    else {
-                        core.info(`Pull request does not have the label ${label}. Skipping...`);
-                    }
-                }
-                else {
-                    core.info("Auto merge is disabled for pull-request reviews. You should remove the `pull_request_review` event from the action configuration. Skipping...");
-                }
-                break;
-
-            case "check_run":
-                if (isAutoMergeEvent("check_run")) {
-                    var prs = context.payload.check_run.pull_requests;
-                    if (!prs) {
-                        core.info("Empty pull request list. Stepping out...");
-                        return;
-                    }
-                    for (const element of prs) {
-                        const pullResponse = await client.pulls.get({
-                            owner,
-                            pull_number: element.number,
-                            repo,
-                        }),
-                            data = pullResponse.data;
-                        core.debug(JSON.stringify(data));
-                        if (data.labels.map(labelMap).includes(label)) {
-                            await merge(element.number);
-                        }
-                        else {
-                            core.info(`Pull request #${element.number} does not have the label ${label}. Skipping...`);
-                        }
-                    }
-                }
-                else {
-                    core.info("Auto merge is disabled for check runs. You should remove the `check_run` event from the action configuration. Skipping...");
-                }
-                break;
+        } else {
+            core.info("master브랜치 push이벤트 이외에는 동작하지 않음.")
         }
     }
     catch (err) {
-        //Even if it's a valid situation, we want to fail the action in order to be able to find the issue and fix it.
         core.setFailed(err.message);
         core.debug(JSON.stringify(err));
     }
@@ -522,7 +468,7 @@ async function push(targetBranch) {
         core.info(`#${pull_number} 풀리퀘에 '${label}' 라벨이 추가되었습니다.`);
         core.debug(JSON.stringify(labelsResponse.data));
     }
-    if (isAutoMergeEvent("push")) {
+    if (github.context.eventName === "push") {
         await merge(pull_number);
     }
     else {
