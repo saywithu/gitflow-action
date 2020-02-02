@@ -53,7 +53,8 @@ async function run() {
                     core.info(`branch = ${branch}`);
                     if(!branch) break;
                     // const base = getBranch(branch);
-                    existsBranch(branch)
+                    const isExists = existsBranch(branch)
+                    core.info(`isExists = ${isExists}`)
                     // await push(base);
                 }
                 break;
@@ -194,10 +195,11 @@ async function existsBranch(br) {
         repo
     });
     for(const branch of branches) {
-        core.info(`branch => ${branch}`)
+        core.info(`branch.name => ${branch.name}`)
+        if(br === branch) return true;
     }
 
-    return true
+    return false;
 }
 
 run();
