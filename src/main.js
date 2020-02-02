@@ -63,7 +63,11 @@ async function run() {
                         owner,
                         repo,
                         branch
-                    });
+                    }).catch(e => {
+                        core.error(e.status);
+                        core.error(e.message);
+                    })
+                    ;
                     core.info(JSON.stringify(result2));
                     // await push(base);
                 }
