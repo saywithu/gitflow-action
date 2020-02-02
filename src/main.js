@@ -2,11 +2,13 @@ const core = require("@actions/core"),
     github = require("@actions/github");
 
 const token = core.getInput("github-token", { required: true }),
-    releaseBranch = getBranch("release"),
-    devBranch = getBranch("dev"),
+    // releaseBranch = getBranch("release"),
+    // devBranch = getBranch("dev"),
+    // qa = getBranch("qa"),
     masterBranch = getBranch("master"),
     label = getInput("label", "자동머지"),
     auto_merge = getInput("auto-merge", "true"),
+    auto_merge_branches = getInput("auto_merge_branches", "release"),
     require_merge = getInput("require-merge", "false") == "true",
     context = github.context,
     owner = context.repo.owner,
@@ -22,13 +24,13 @@ function getBranch(name) {
     return getInput(name, name);
 }
 
-function getTarget(head) {
-    switch (head) {
-        case releaseBranch: return masterBranch;
-        case masterBranch: return devBranch;
-        default: return null;
-    }
-}
+// function getTarget(head) {
+//     switch (head) {
+//         case releaseBranch: return masterBranch;
+//         case masterBranch: return devBranch;
+//         default: return null;
+//     }
+// }
 
 function isAutoMergeEvent(eventName) {
     if (auto_merge == "true") {
@@ -44,10 +46,15 @@ async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
         switch (github.context.eventName) {
-            case "push":
-                await push();
+            case "push": {
+                const branches = auto_merge_branches.split(",").map(e => e.trim());
+                core.info(`auto_merge_branches = ${auto_merge_branches}`)
+                for (const branch of branches) {
+                    const base = getBranch(branch);
+                    await push(base);
+                }
                 break;
-
+            }
             case "pull_request_review":
                 if (isAutoMergeEvent("pull_request_review")) {
                     if (context.payload.pull_request.labels.map(labelMap).includes(label)) {
@@ -102,11 +109,11 @@ function labelMap(label) {
     return label.name;
 }
 
-async function push() {
-    const head = context.ref.substr(11),
-        base = getTarget(head);
+async function push(base) {
+    const head = context.ref.substr(11);
+        // base = getTarget(head);
     if (!base) {
-        core.info(`Branch ${head} is neither ${masterBranch} or ${releaseBranch}. Skipping...`);
+        core.info(`Branch ${head} is neither ${masterBranch}. Skipping...`);
         return;
     }
     const pulls = await client.pulls.list({
@@ -118,7 +125,7 @@ async function push() {
     });
     core.debug(JSON.stringify(pulls.data));
     let pull_number;
-    if (pulls.data.length == 1) {
+    if (pulls.data.length === 1) {
         const data = pulls.data[0];
         pull_number = data.number;
         core.info(`Pull request already exists: #${pull_number}.`);
