@@ -491,7 +491,7 @@ async function push(targetBranch) {
     if (pulls.data.length === 1) {
         const data = pulls.data[0];
         pull_number = data.number;
-        core.info(`#${pull_number}(master -> ${targetBranch}) 풀리퀘가 이미 존재합니다.`);
+        core.info(`#${pull_number}(master -> ${targetBranch}) 풀리퀘가 이미 존재해 업데이트합니다.`);
         // 풀리퀘 label이 '자동머지'인 경우에만 푸시가 되고 머지가 된다.
         const labels = data.labels.map(labelMap);
         core.info(`labels => ${JSON.stringify(labels)}`)
