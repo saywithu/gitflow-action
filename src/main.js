@@ -109,6 +109,7 @@ function labelMap(label) {
 
 async function push(targetBranch) {
     const head = context.ref.substr(11);
+    core.info(`head => ${head}`)
     const pulls = await client.pulls.list({
         base: targetBranch,
         head: `${owner}:${head}`,
@@ -121,7 +122,7 @@ async function push(targetBranch) {
     if (pulls.data.length === 1) {
         const data = pulls.data[0];
         pull_number = data.number;
-        core.info(`#${pull_number} 풀리퀘가 이미 존재합니다.`);
+        core.info(`#${pull_number}(master -> ${targetBranch}) 풀리퀘가 이미 존재합니다.`);
         const labels = data.labels.map(labelMap);
         core.info(`labels => ${labels}`)
         if (!labels.includes(label)) {
