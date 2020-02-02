@@ -422,10 +422,9 @@ async function run() {
                     const base = getBranch(branch);
                     core.info(`base = ${base}`);
                     if(!base) break;
-                    const result = client.repos.getBranch({
+                    const result = client.repos.listBranches({
                         owner,
-                        repo,
-                        base
+                        repo
                     });
                     core.info(JSON.stringify(result));
                     await push(base);
