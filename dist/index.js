@@ -510,7 +510,7 @@ async function push(targetBranch) {
         }),
             creationData = creationResponse.data;
         pull_number = creationData.number;
-        core.info(`Pull request #${pull_number} created.`);
+        core.info(`자동머지 풀리퀘(#${pull_number})가 생성되었습니다.`);
         core.debug(JSON.stringify(creationData));
         const labelsResponse = await client.issues.addLabels({
             issue_number: pull_number,
@@ -518,7 +518,7 @@ async function push(targetBranch) {
             owner,
             repo,
         });
-        core.info(`Label ${label} added to #${pull_number}.`);
+        core.info(`#${pull_number} 풀리퀘에 '${label}' 라벨이 추가되었습니다.`);
         core.debug(JSON.stringify(labelsResponse.data));
     }
     if (isAutoMergeEvent("push")) {
