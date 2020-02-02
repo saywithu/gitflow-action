@@ -371,7 +371,6 @@ const core = __webpack_require__(470),
     github = __webpack_require__(469);
 
 const token = core.getInput("github-token", { required: true }),
-    masterBranch = getBranch("master"),
     label = getInput("label", "자동머지"),
     auto_merge = getInput("auto-merge", "true"),
     auto_merge_branches = getInput("auto-merge-branches", "release"),
@@ -486,6 +485,7 @@ async function push(targetBranch) {
         repo,
         state: "open",
     });
+    core.info(`pulls => ${JSON.stringify(pulls)}`)
     core.debug(JSON.stringify(pulls.data));
     let pull_number;
     if (pulls.data.length === 1) {
@@ -494,7 +494,7 @@ async function push(targetBranch) {
         core.info(`#${pull_number}(master -> ${targetBranch}) 풀리퀘가 이미 존재합니다.`);
         // 풀리퀘 label이 '자동머지'인 경우에만 푸시가 되고 머지가 된다.
         const labels = data.labels.map(labelMap);
-        core.info(`labels => ${labels}`)
+        core.info(`labels => ${JSON.stringify(labels)}`)
         if (!labels.includes(label)) {
             core.info(`Pull request does not have the label ${label}. Skipping...`);
             return;
