@@ -46,6 +46,7 @@ async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
         const branchList = await getBranchList();
+        core.info(`branchList => ${JSON.stringify(branchList)}`)
         switch (github.context.eventName) {
             case "push": {
                 core.info(`auto_merge_branches => ${auto_merge_branches}`)
@@ -56,7 +57,7 @@ async function run() {
                     const base = getBranch(branch);
                     core.info(`base branch = ${base}`);
                     if(branchList.includes(base)){
-                        // await push(base);
+                        await push(base);
                     } else {
                         core.error(`${base} 브랜치가 존재하지 않습니다.`)
                     }
