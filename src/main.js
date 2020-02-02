@@ -2,9 +2,6 @@ const core = require("@actions/core"),
     github = require("@actions/github");
 
 const token = core.getInput("github-token", { required: true }),
-    // releaseBranch = getBranch("release"),
-    // devBranch = getBranch("dev"),
-    // qa = getBranch("qa"),
     masterBranch = getBranch("master"),
     label = getInput("label", "자동머지"),
     auto_merge = getInput("auto-merge", "true"),
@@ -23,14 +20,6 @@ function getInput(name, fallback) {
 function getBranch(name) {
     return getInput(name, name);
 }
-
-// function getTarget(head) {
-//     switch (head) {
-//         case releaseBranch: return masterBranch;
-//         case masterBranch: return devBranch;
-//         default: return null;
-//     }
-// }
 
 function isAutoMergeEvent(eventName) {
     if (auto_merge == "true") {
@@ -120,7 +109,6 @@ function labelMap(label) {
 
 async function push(base) {
     const head = context.ref.substr(11);
-        // base = getTarget(head);
     if (!base) {
         core.info(`Branch ${head} is neither ${masterBranch}. Skipping...`);
         return;
@@ -137,8 +125,9 @@ async function push(base) {
     if (pulls.data.length === 1) {
         const data = pulls.data[0];
         pull_number = data.number;
-        core.info(`Pull request already exists: #${pull_number}.`);
+        core.info(`#${pull_number} 풀리퀘가 이미 존재합니다.`);
         const labels = data.labels.map(labelMap);
+        core.info(`labels => ${labels}`)
         if (!labels.includes(label)) {
             core.info(`Pull request does not have the label ${label}. Skipping...`);
             return;
