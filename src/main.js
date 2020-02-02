@@ -38,9 +38,11 @@ async function run() {
                     core.error(`${base} 브랜치가 존재하지 않습니다.`)
                 }
             }
+            core.info("2222");
         } else {
             core.info("master브랜치 push이벤트 이외에는 동작하지 않음.")
         }
+        core.info("3333");
     }
     catch (err) {
         core.info("######");
@@ -100,6 +102,7 @@ async function push(targetBranch) {
     }
     if (github.context.eventName === "push") {
         await merge(pull_number);
+        core.info("111111");
     }
     else {
         core.info("Auto merge is disabled for pushes. Skipping...");
