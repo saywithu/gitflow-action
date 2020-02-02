@@ -29,7 +29,6 @@ async function run() {
             core.info(`auto_merge_branches => ${auto_merge_branches}`)
             const branches = auto_merge_branches.split(",").map(e => e.trim());
             for (const branch of branches) {
-                core.info(`branch = ${branch}`);
                 if(!branch) break;
                 const base = getBranch(branch);
                 core.info(`base branch = ${base}`);
@@ -44,6 +43,7 @@ async function run() {
         }
     }
     catch (err) {
+        core.info("######");
         core.setFailed(err.message);
         core.debug(JSON.stringify(err));
     }
