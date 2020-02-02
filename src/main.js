@@ -53,22 +53,7 @@ async function run() {
                     core.info(`branch = ${branch}`);
                     if(!branch) break;
                     // const base = getBranch(branch);
-                    const result = await client.repos.listBranches({
-                        owner,
-                        repo
-                    });
-                    core.info(JSON.stringify(result));
-                    core.info("###########");
-                    const result2 = await client.repos.getBranch({
-                        owner,
-                        repo,
-                        branch
-                    }).catch(e => {
-                        core.error(e.status);
-                        core.error(e.message);
-                    })
-                    ;
-                    core.info(JSON.stringify(result2));
+                    existsBranch(branch)
                     // await push(base);
                 }
                 break;
@@ -200,6 +185,19 @@ async function merge(pull_number) {
         }
         core.debug(err);
     }
+}
+
+async function existsBranch(br) {
+    core.info(`====> ${br}`)
+    const { data : branches} = await client.repos.listBranches({
+        owner,
+        repo
+    });
+    for(const branch of branches) {
+        core.info(`branch => ${branch}`)
+    }
+
+    return true
 }
 
 run();
