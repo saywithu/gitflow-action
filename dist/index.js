@@ -485,7 +485,6 @@ async function push(targetBranch) {
         repo,
         state: "open",
     });
-    core.info(`pulls => ${JSON.stringify(pulls)}`)
     core.debug(JSON.stringify(pulls.data));
     let pull_number;
     if (pulls.data.length === 1) {
