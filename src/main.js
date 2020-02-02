@@ -58,7 +58,8 @@ async function run() {
                         repo
                     });
                     core.info(JSON.stringify(result));
-                    await push(base);
+                    core.info(result);
+                    // await push(base);
                 }
                 break;
             }
