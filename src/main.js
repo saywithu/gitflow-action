@@ -3,7 +3,7 @@ const core = require("@actions/core"),
 
 const token = core.getInput("github-token", { required: true }),
     label = getInput("label", "자동머지"),
-    auto_merge_branches = getInput("auto-merge-branches", "release"),
+    auto_merge_branches = getInput("auto-merge-branches"),
     context = github.context,
     owner = context.repo.owner,
     repo = context.repo.repo,
@@ -25,23 +25,20 @@ async function run() {
         const branchList = await getBranchList();
         core.info(`branchList => ${JSON.stringify(branchList)}`)
         if(github.context.eventName === "push") {
-            core.info(`auto_merge_branches => ${auto_merge_branches}`)
             const branches = auto_merge_branches.split(",").map(e => e.trim());
             for (const branch of branches) {
                 if(!branch) break;
-                const base = getBranch(branch);
-                core.info(`base branch = ${base}`);
-                if(branchList.includes(base)){
-                    await push(base);
+                const targetBranch = getBranch(branch);
+                core.info(`target branch = ${targetBranch}`);
+                if(branchList.includes(targetBranch)){
+                    await push(targetBranch);
                 } else {
-                    core.error(`${base} 브랜치가 존재하지 않습니다.`)
+                    core.error(`${targetBranch} 브랜치가 존재하지 않습니다.`)
                 }
             }
-            core.info("2222");
         } else {
             core.info("master브랜치 push이벤트 이외에는 동작하지 않음.")
         }
-        core.info("3333");
     }
     catch (err) {
         core.info("######");
@@ -101,7 +98,6 @@ async function push(targetBranch) {
     }
     if (github.context.eventName === "push") {
         await merge(pull_number);
-        core.info("111111");
     }
     else {
         core.info("master브랜치 push이벤트 이외에는 동작하지 않음.");
@@ -115,7 +111,7 @@ async function merge(pull_number) {
             pull_number,
             repo,
         });
-        core.info(`Pull request #${pull_number} merged.`);
+        core.info(`#${pull_number} 풀리퀘가 머지되었습니다.`);
         core.debug(JSON.stringify(mergeResponse.data));
     }
     catch (err) {
