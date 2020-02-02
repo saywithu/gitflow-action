@@ -58,7 +58,7 @@ async function run() {
                         repo
                     });
                     core.info(JSON.stringify(result));
-                    core.info(result);
+                    core.info("###########");
                     const result2 = await client.repos.getBranch({
                         owner,
                         repo,
