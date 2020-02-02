@@ -373,7 +373,6 @@ const core = __webpack_require__(470),
 const token = core.getInput("github-token", { required: true }),
     label = getInput("label", "자동머지"),
     auto_merge_branches = getInput("auto-merge-branches", "release"),
-    require_merge = getInput("require-merge", "false") == "true",
     context = github.context,
     owner = context.repo.owner,
     repo = context.repo.repo,
@@ -444,7 +443,7 @@ async function push(targetBranch) {
         const labels = data.labels.map(labelMap);
         core.info(`labels => ${JSON.stringify(labels)}`)
         if (!labels.includes(label)) {
-            core.info(`Pull request does not have the label ${label}. Skipping...`);
+            core.info(`풀리퀘가 '${label}' 라벨이 적용되어 있지않아 자동머지를 패스합니다.`);
             return;
         }
     }
@@ -474,7 +473,7 @@ async function push(targetBranch) {
         core.info("111111");
     }
     else {
-        core.info("Auto merge is disabled for pushes. Skipping...");
+        core.info("master브랜치 push이벤트 이외에는 동작하지 않음.");
     }
 }
 
@@ -489,13 +488,8 @@ async function merge(pull_number) {
         core.debug(JSON.stringify(mergeResponse.data));
     }
     catch (err) {
-        if (require_merge) {
-            core.setFailed("Merge failed.");
-        } else {
-            core.info("Merge failed.");
-        }
-        core.info("555");
-        core.info(`====> ${JSON.stringify(err || '')}`);
+        // TODO: send slack
+        core.setFailed("Merge failed.");
     }
 }
 
