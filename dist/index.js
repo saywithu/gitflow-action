@@ -414,6 +414,7 @@ function isAutoMergeEvent(eventName) {
 async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
+        const branchList = await getBranchList();
         switch (github.context.eventName) {
             case "push": {
                 core.info(`auto_merge_branches => ${auto_merge_branches}`)
@@ -421,10 +422,13 @@ async function run() {
                 for (const branch of branches) {
                     core.info(`branch = ${branch}`);
                     if(!branch) break;
-                    // const base = getBranch(branch);
-                    const isExists = existsBranch(branch)
-                    core.info(`isExists = ${isExists}`)
-                    // await push(base);
+                    const base = getBranch(branch);
+                    core.info(`base branch = ${base}`);
+                    if(branchList.includes(base)){
+                        // await push(base);
+                    } else {
+                        core.error(`${base} 브랜치가 존재하지 않습니다.`)
+                    }
                 }
                 break;
             }
@@ -557,18 +561,13 @@ async function merge(pull_number) {
     }
 }
 
-async function existsBranch(br) {
-    core.info(`====> ${br}`)
+async function getBranchList() {
     const { data : branches} = await client.repos.listBranches({
         owner,
         repo
     });
-    for(const branch of branches) {
-        core.info(`branch.name => ${branch.name}`)
-        if(br === branch) return true;
-    }
 
-    return false;
+    return branches.map(branch => branch.name);
 }
 
 run();
