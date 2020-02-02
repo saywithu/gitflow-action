@@ -3,7 +3,7 @@ const core = require("@actions/core"),
 
 const token = core.getInput("github-token", { required: true }),
     label = getInput("label", "자동머지"),
-    auto_merge_branches = getInput("auto-merge-branches"),
+    auto_merge_branches = getInput("auto-merge-branches", ""),
     context = github.context,
     owner = context.repo.owner,
     repo = context.repo.repo,
