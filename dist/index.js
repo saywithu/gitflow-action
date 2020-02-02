@@ -476,14 +476,10 @@ function labelMap(label) {
     return label.name;
 }
 
-async function push(base) {
+async function push(targetBranch) {
     const head = context.ref.substr(11);
-    if (!base) {
-        core.info(`Branch ${head} is neither ${masterBranch}. Skipping...`);
-        return;
-    }
     const pulls = await client.pulls.list({
-        base,
+        base: targetBranch,
         head: `${owner}:${head}`,
         owner,
         repo,
@@ -504,11 +500,11 @@ async function push(base) {
     }
     else {
         const creationResponse = await client.pulls.create({
-            base,
+            base: targetBranch,
             head,
             owner,
             repo,
-            title: `${head} -> ${base}`,
+            title: `${head} -> ${targetBranch}`,
         }),
             creationData = creationResponse.data;
         pull_number = creationData.number;
@@ -551,6 +547,10 @@ async function merge(pull_number) {
     }
 }
 
+/**
+ * 브랜치 목록 취득.
+ * @returns {Promise<*>}
+ */
 async function getBranchList() {
     const { data : branches} = await client.repos.listBranches({
         owner,
