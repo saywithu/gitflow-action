@@ -495,7 +495,7 @@ async function merge(pull_number) {
             core.info("Merge failed.");
         }
         core.info("555");
-        core.error(err.message);
+        core.info(`====> ${JSON.stringify(err || '')}`);
     }
 }
 
