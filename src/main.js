@@ -126,7 +126,7 @@ async function merge(pull_number) {
             core.info("Merge failed.");
         }
         core.info("555");
-        core.debug(err);
+        // core.debug(err);
     }
 }
 
