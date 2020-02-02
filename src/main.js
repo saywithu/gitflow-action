@@ -33,6 +33,7 @@ function isAutoMergeEvent(eventName) {
 async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
+        if(!auto_merge_branches) return;
         const branchList = await getBranchList();
         core.info(`branchList => ${JSON.stringify(branchList)}`)
         switch (github.context.eventName) {
