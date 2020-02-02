@@ -53,12 +53,18 @@ async function run() {
                     core.info(`branch = ${branch}`);
                     if(!branch) break;
                     // const base = getBranch(branch);
-                    const result = client.repos.listBranches({
+                    const result = await client.repos.listBranches({
                         owner,
                         repo
                     });
                     core.info(JSON.stringify(result));
                     core.info(result);
+                    const result2 = await client.repos.getBranch({
+                        owner,
+                        repo,
+                        branch
+                    });
+                    core.info(JSON.stringify(result2));
                     // await push(base);
                 }
                 break;
