@@ -21,7 +21,10 @@ function getBranch(name) {
 async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
-        if(!auto_merge_branches) return;
+        if(!auto_merge_branches) {
+            core.info(`자동머지 브랜치가 지정되지 않아 패스합니다.`)
+            return;
+        }
         const branchList = await getBranchList();
         core.info(`branchList => ${JSON.stringify(branchList)}`)
         if(github.context.eventName === "push") {
