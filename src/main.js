@@ -47,10 +47,12 @@ async function run() {
         core.debug(JSON.stringify(context.payload));
         switch (github.context.eventName) {
             case "push": {
+                core.info(`auto_merge_branches => ${auto_merge_branches}`)
                 const branches = auto_merge_branches.split(",").map(e => e.trim());
                 for (const branch of branches) {
                     const base = getBranch(branch);
-                    core.info(`branch = ${branch}`);
+                    core.info(`base = ${base}`);
+                    if(!base) break;
                     const result = client.repos.getBranch({
                         owner,
                         repo,
