@@ -9,6 +9,8 @@ const token = core.getInput("github-token", { required: true }),
     repo = context.repo.repo,
     client = new github.GitHub(token);
 
+const slack = require('./lib/SlackSend.js');
+
 function getInput(name, fallback) {
     const input = core.getInput(name);
     return input || fallback;
@@ -21,6 +23,7 @@ function getBranch(name) {
 async function run() {
     try {
         core.debug(JSON.stringify(context.payload));
+        await slack.postMessage();
         if(!auto_merge_branches) {
             core.info(`자동머지 브랜치가 지정되지 않아 패스합니다.`)
             return;
