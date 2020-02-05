@@ -1,5 +1,5 @@
 const { WebClient } = require('@slack/web-api');
-const token = "xoxp-6384712549-174654512261-452694207155-18f0278b96e5b1ac3c4392871756e750";
+const token = "";
 const web = new WebClient(token);
 
 exports.postMessage = async () => {
